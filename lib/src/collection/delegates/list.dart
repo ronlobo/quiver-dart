@@ -14,19 +14,18 @@
 
 part of quiver.collection;
 
-/**
- * An implementation of [List] that delegates all methods to another [List].
- * For instance you can create a FruitList like this :
- *
- *     class FruitList extends DelegatingList<Fruit> {
- *       final List<Fruit> _fruits = [];
- *
- *       List<Fruit> get delegate => _fruits;
- *
- *       // custom methods
- *     }
- */
-abstract class DelegatingList<E> extends DelegatingIterable<E> implements List<E> {
+/// An implementation of [List] that delegates all methods to another [List].
+/// For instance you can create a FruitList like this :
+///
+///     class FruitList extends DelegatingList<Fruit> {
+///       final List<Fruit> _fruits = [];
+///
+///       List<Fruit> get delegate => _fruits;
+///
+///       // custom methods
+///     }
+abstract class DelegatingList<E> extends DelegatingIterable<E>
+    implements List<E> {
   List<E> get delegate;
 
   E operator [](int index) => delegate[index];
@@ -82,8 +81,9 @@ abstract class DelegatingList<E> extends DelegatingIterable<E> implements List<E
   void setAll(int index, Iterable<E> iterable) =>
       delegate.setAll(index, iterable);
 
-  void setRange(int start, int end, Iterable<E> iterable, [int skipCount = 0])
-      => delegate.setRange(start, end, iterable, skipCount);
+  void setRange(int start, int end, Iterable<E> iterable,
+          [int skipCount = 0]) =>
+      delegate.setRange(start, end, iterable, skipCount);
 
   void shuffle([Random random]) => delegate.shuffle(random);
 

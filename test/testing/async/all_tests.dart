@@ -1,4 +1,4 @@
-// Copyright 2013 Google Inc. All Rights Reserved.
+// Copyright 2014 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library quiver.streams.all_tests;
+library quiver.testing.async.all_tests;
 
-import 'concat_test.dart' as concat;
-import 'enumerate_test.dart' as enumerate;
+import 'fake_async_test.dart' as fake_async;
 
 main() {
-  concat.main();
-  enumerate.main();
+  fake_async.main();
 }

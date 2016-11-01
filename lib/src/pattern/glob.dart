@@ -16,17 +16,15 @@ part of quiver.pattern;
 
 // TODO(justin): add more detailed documentation and explain how matching
 // differs or is similar to globs in Python and various shells.
-/**
- * A [Pattern] that matches against filesystem path-like strings with
- * wildcards.
- *
- * The pattern matches strings as follows:
- *   * The whole string must match, not a substring
- *   * Any non wildcard is matched as a literal
- *   * '*' matches one or more characters except '/'
- *   * '?' matches exactly one character except '/'
- *   * '**' matches one or more characters including '/'
- */
+/// A [Pattern] that matches against filesystem path-like strings with
+/// wildcards.
+///
+/// The pattern matches strings as follows:
+///   * The whole string must match, not a substring
+///   * Any non wildcard is matched as a literal
+///   * '*' matches one or more characters except '/'
+///   * '?' matches exactly one character except '/'
+///   * '**' matches one or more characters including '/'
 class Glob implements Pattern {
   final RegExp regex;
   final String pattern;
@@ -35,9 +33,11 @@ class Glob implements Pattern {
       : pattern = pattern,
         regex = _regexpFromGlobPattern(pattern);
 
-  Iterable<Match> allMatches(String str) => regex.allMatches(str);
+  Iterable<Match> allMatches(String str, [int start = 0]) =>
+      regex.allMatches(str, start);
 
-  Match matchAsPrefix(String string, [int start = 0]) => regex.matchAsPrefix(string, start);
+  Match matchAsPrefix(String string, [int start = 0]) =>
+      regex.matchAsPrefix(string, start);
 
   bool hasMatch(String str) => regex.hasMatch(str);
 
@@ -45,7 +45,7 @@ class Glob implements Pattern {
 
   int get hashCode => pattern.hashCode;
 
-  bool operator==(other) => other is Glob && pattern == other.pattern;
+  bool operator ==(other) => other is Glob && pattern == other.pattern;
 }
 
 RegExp _regexpFromGlobPattern(String pattern) {

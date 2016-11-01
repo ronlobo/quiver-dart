@@ -1,4 +1,4 @@
-// Copyright 2013 Google Inc. All Rights Reserved.
+// Copyright 2014 Google Inc. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
 
 library quiver.testing.all_tests;
 
+import 'async/all_tests.dart' as async;
+import 'equality/all_tests.dart' as equality;
+
 main() {
-  // No tests for the testing library yet.
+  async.main();
+  equality.main();
 }

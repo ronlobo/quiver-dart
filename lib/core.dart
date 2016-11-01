@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Simple code with broad use cases.
- */
+/// Simple code with broad use cases.
 library quiver.core;
+import 'dart:collection';
 
 part 'src/core/hash.dart';
 part 'src/core/optional.dart';
 
-/**
- * Returns the first non-null argument. If all arguments are null, throws
- * an [ArgumentError].
- *
- * Note: if [o1] is an [Optional], this can be accomplished with `o1.or(o2)`.
- */
-Object firstNonNull(o1, o2, [o3, o4]) {
+/// Returns the first non-null argument. If all arguments are null, throws an
+/// [ArgumentError].
+///
+/// Note: if [o1] is an [Optional], this can be accomplished with `o1.or(o2)`.
+firstNonNull(o1, o2, [o3, o4]) {
   if (o1 != null) return o1;
   if (o2 != null) return o2;
   if (o3 != null) return o3;

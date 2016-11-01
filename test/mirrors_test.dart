@@ -18,7 +18,7 @@ import 'dart:collection';
 import 'dart:mirrors';
 
 import 'package:quiver/mirrors.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 main() {
   group('getTypeName', () {
@@ -42,26 +42,24 @@ main() {
       expect(implements(foo, String), false);
       expect(implements(foo, num), false);
     });
-
   });
 
   group('classImplements', () {
     test('should return true if an class implements an interface', () {
       var foo = new Foo();
       var mirror = reflect(foo).type;
-      expect(classImplements(mirror, getTypeName(Object)), true);
-      expect(classImplements(mirror, getTypeName(Foo)), true);
-      expect(classImplements(mirror, getTypeName(Comparable)), true);
-      expect(classImplements(mirror, getTypeName(Iterable)), true);
+      expect(classImplements(mirror, reflectClass(Object)), true);
+      expect(classImplements(mirror, reflectClass(Foo)), true);
+      expect(classImplements(mirror, reflectClass(Comparable)), true);
+      expect(classImplements(mirror, reflectClass(Iterable)), true);
     });
 
     test("should return false if an object doesn't implement an interface", () {
       var foo = new Foo();
       var mirror = reflect(foo).type;
-      expect(classImplements(mirror, getTypeName(String)), false);
-      expect(classImplements(mirror, getTypeName(num)), false);
+      expect(classImplements(mirror, reflectClass(String)), false);
+      expect(classImplements(mirror, reflectClass(num)), false);
     });
-
   });
 
   group('getMemberMirror', () {
@@ -78,7 +76,7 @@ main() {
     test('should be callable', () {
       var i = 2;
       var mirror = reflect(i);
-      var method = new Method(mirror, const Symbol('+'));
+      var method = new Method(mirror, const Symbol('+')) as dynamic;
       expect(method(3), 5);
     });
 
@@ -86,10 +84,9 @@ main() {
       // this test will fail when named argument support is added
       var i = [1, 2];
       var mirror = reflect(i);
-      var method = new Method(mirror, const Symbol('toList'));
+      var method = new Method(mirror, const Symbol('toList')) as dynamic;
       expect(method(growable: false), [1, 2]);
     });
-
   });
 }
 

@@ -16,38 +16,30 @@ library quiver.mirrors;
 
 import 'dart:mirrors';
 
-/**
- * Returns the qualified name of [t].
- */
+/// Returns the qualified name of [t].
 Symbol getTypeName(Type t) => reflectClass(t).qualifiedName;
 
-
-/**
- * Returns true if [o] implements [type].
- */
+/// Returns true if [o] implements [type].
 bool implements(Object o, Type type) =>
-    classImplements(reflect(o).type, getTypeName(type));
+    classImplements(reflect(o).type, reflectClass(type));
 
-/**
- * Returns true if [m], its superclasses or interfaces have the qualified name
- * [name].
- */
-bool classImplements(ClassMirror m, Symbol name) {
-  if (m == null) return false;
-  if (m.qualifiedName == name) return true;
-  if (m.qualifiedName == const Symbol('dart.core.Object')) return false;
-  if (classImplements(m.superclass, name)) return true;
-  if (m.superinterfaces.any((i) => classImplements(i, name))) return true;
+/// Returns true if the class represented by [classMirror] implements the class
+/// represented by [interfaceMirror].
+bool classImplements(ClassMirror classMirror, ClassMirror interfaceMirror) {
+  if (classMirror == null) return false;
+  // TODO: change to comparing mirrors when dartbug.com/19781 is fixed
+  if (classMirror.qualifiedName == interfaceMirror.qualifiedName) return true;
+  if (classImplements(classMirror.superclass, interfaceMirror)) return true;
+  if (classMirror.superinterfaces
+      .any((i) => classImplements(i, interfaceMirror))) return true;
   return false;
 }
 
-/**
- * Walks up the class hierarchy to find a method declaration with the given
- * [name].
- *
- * Note that it's not possible to tell if there's an implementation via
- * noSuchMethod().
- */
+/// Walks up the class hierarchy to find a method declaration with the given
+/// [name].
+///
+/// Note that it's not possible to tell if there's an implementation via
+/// noSuchMethod().
 DeclarationMirror getDeclaration(ClassMirror classMirror, Symbol name) {
   if (classMirror.declarations.containsKey(name)) {
     return classMirror.declarations[name];
@@ -67,10 +59,8 @@ DeclarationMirror getDeclaration(ClassMirror classMirror, Symbol name) {
   return null;
 }
 
-/**
- * Closurzes a method reflectively.
- */
-class Method { // implements Function
+/// Closurizes a method reflectively.
+class Method /* implements Function */ {
   final InstanceMirror mirror;
   final Symbol symbol;
 
@@ -80,8 +70,8 @@ class Method { // implements Function
     if (i.isMethod && i.memberName == const Symbol('call')) {
       if (i.namedArguments != null && i.namedArguments.isNotEmpty) {
         // this will fail until named argument support is implemented
-        return mirror.invoke(symbol, i.positionalArguments, i.namedArguments)
-            .reflectee;
+        return mirror.invoke(
+            symbol, i.positionalArguments, i.namedArguments).reflectee;
       }
       return mirror.invoke(symbol, i.positionalArguments).reflectee;
     }

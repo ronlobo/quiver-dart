@@ -14,130 +14,113 @@
 
 part of quiver.collection;
 
-/**
- * An associative container that maps a key to multiple values.
- *
- * Key lookups return mutable collections that are views of the multimap.
- * Updates to the multimap are reflected in these collections and similarly,
- * modifications to the returned collections are reflected in the multimap.
- */
+/// An associative container that maps a key to multiple values.
+///
+/// Key lookups return mutable collections that are views of the multimap.
+/// Updates to the multimap are reflected in these collections and similarly,
+/// modifications to the returned collections are reflected in the multimap.
 abstract class Multimap<K, V> {
-  /**
-   * Constructs a new list-backed multimap.
-   */
+  /// Constructs a new list-backed multimap.
   factory Multimap() => new ListMultimap<K, V>();
 
-  /**
-   * Returns whether this multimap contains the given [value].
-   */
+  /// Constructs a new list-backed multimap. For each element e of [iterable],
+  /// adds an association from [key](e) to [value](e). [key] and [value] each
+  /// default to the identity function.
+  factory Multimap.fromIterable(Iterable iterable,
+      {K key(element), V value(element)}) = ListMultimap<K, V>.fromIterable;
+
+  /// Returns whether this multimap contains the given [value].
   bool containsValue(Object value);
 
-  /**
-   * Returns whether this multimap contains the given [key].
-   */
+  /// Returns whether this multimap contains the given [key].
   bool containsKey(Object key);
 
-  /**
-   * Returns the values for the given [key]. An empty iterable is returned if
-   * [key] is not mapped. The returned collection is a view on the multimap.
-   * Updates to the collection modify the multimap and likewise, modifications
-   * to the multimap are reflected in the returned collection.
-   */
+  /// Returns the values for the given [key]. An empty iterable is returned if
+  /// [key] is not mapped. The returned collection is a view on the multimap.
+  /// Updates to the collection modify the multimap and likewise, modifications
+  /// to the multimap are reflected in the returned collection.
   Iterable<V> operator [](Object key);
 
-  /**
-   * Adds an association from the given key to the given value.
-   */
+  /// Adds an association from the given key to the given value.
   void add(K key, V value);
 
-  /**
-   * Adds an association from the given key to each of the given values.
-   */
-   void addValues(K key, Iterable<V> values);
+  /// Adds an association from the given key to each of the given values.
+  void addValues(K key, Iterable<V> values);
 
-  /**
-   * Adds all associations of [other] to this multimap.
-   *
-   * The operation is equivalent to doing `this[key] = value` for each key
-   * and associated value in other. It iterates over [other], which must
-   * therefore not change during the iteration.
-   */
+  /// Adds all associations of [other] to this multimap.
+  ///
+  /// The operation is equivalent to doing `this[key] = value` for each key and
+  /// associated value in other. It iterates over [other], which must therefore
+  /// not change during the iteration.
   void addAll(Multimap<K, V> other);
 
-  /**
-   * Removes the association between the given [key] and [value]. Returns
-   * `true` if the association existed, `false` otherwise.
-   */
+  /// Removes the association between the given [key] and [value]. Returns
+  /// `true` if the association existed, `false` otherwise.
   bool remove(Object key, V value);
 
-  /**
-   * Removes the association for the given [key]. Returns the collection of
-   * removed values, or an empty iterable if [key] was unmapped.
-   */
+  /// Removes the association for the given [key]. Returns the collection of
+  /// removed values, or an empty iterable if [key] was unmapped.
   Iterable<V> removeAll(Object key);
 
-  /**
-   * Removes all data from the multimap.
-   */
+  /// Removes all data from the multimap.
   void clear();
 
-  /**
-   * Applies [f] to each {key, Iterable<value>} pair of the multimap.
-   *
-   * It is an error to add or remove keys from the map during iteration.
-   */
+  /// Applies [f] to each {key, Iterable<value>} pair of the multimap.
+  ///
+  /// It is an error to add or remove keys from the map during iteration.
   void forEachKey(void f(K key, Iterable<V> value));
 
-  /**
-   * Applies [f] to each {key, value} pair of the multimap.
-   *
-   * It is an error to add or remove keys from the map during iteration.
-   */
+  /// Applies [f] to each {key, value} pair of the multimap.
+  ///
+  /// It is an error to add or remove keys from the map during iteration.
   void forEach(void f(K key, V value));
 
-  /**
-   * The keys of [this].
-   */
+  /// The keys of [this].
   Iterable<K> get keys;
 
-  /**
-   * The values of [this].
-   */
+  /// The values of [this].
   Iterable<V> get values;
 
-  /**
-   * Returns a copy of this multimap as a map.
-   */
-  Map<K, Iterable<V>> toMap();
+  /// Returns a view of this multimap as a map.
+  Map<K, Iterable<V>> asMap();
 
-  /**
-   * The number of keys in the multimap.
-   */
+  /// The number of keys in the multimap.
   int get length;
 
-  /**
-   * Returns true if there is no key in the multimap.
-   */
+  /// Returns true if there is no key in the multimap.
   bool get isEmpty;
 
-  /**
-   * Returns true if there is at least one key in the multimap.
-   */
+  /// Returns true if there is at least one key in the multimap.
   bool get isNotEmpty;
 }
 
-/**
- * Abstract base class for multimap implementations.
- */
-abstract class _BaseMultimap<K, V> implements Multimap<K, V> {
-  final Map<K, Iterable<V>> _map = new HashMap();
+/// Abstract base class for multimap implementations.
+abstract class _BaseMultimap<K, V, C extends Iterable<V>>
+    implements Multimap<K, V> {
+  static /*=T*/ _id/*<T>*/(/*=T*/ x) => x;
 
-  Iterable<V> _create();
-  void _add(Iterable<V> iterable, V value);
-  void _addAll(Iterable<V> iterable, Iterable<V> values);
-  void _clear(Iterable<V> iterable);
-  bool _remove(Iterable<V> iterable, V value);
-  Iterable<V> _wrap(Object key, Iterable<V> iterable);
+  _BaseMultimap();
+
+  /// Constructs a new multimap. For each element e of [iterable], adds an
+  /// association from [key](e) to [value](e). [key] and [value] each default
+  /// to the identity function.
+  _BaseMultimap.fromIterable(Iterable iterable,
+      {K key(element), V value(element)}) {
+    key ??= _id;
+    value ??= _id;
+    for (var element in iterable) {
+      add(key(element), value(element));
+    }
+  }
+
+  final Map<K, C> _map = new HashMap();
+
+  C _create();
+  void _add(C iterable, V value);
+  void _addAll(C iterable, Iterable<V> value);
+  void _clear(C iterable);
+  bool _remove(C iterable, Object value);
+  Iterable<V> _wrap(Object key, C iterable);
 
   bool containsValue(Object value) => values.contains(value);
   bool containsKey(Object key) => _map.keys.contains(key);
@@ -160,16 +143,14 @@ abstract class _BaseMultimap<K, V> implements Multimap<K, V> {
     _addAll(_map[key], values);
   }
 
-  /**
-   * Adds all associations of [other] to this multimap.
-   *
-   * The operation is equivalent to doing `this[key] = value` for each key
-   * and associated value in other. It iterates over [other], which must
-   * therefore not change during the iteration.
-   *
-   * This implementation iterates through each key of [other] and adds the
-   * associated values to this instance via [addValues].
-   */
+  /// Adds all associations of [other] to this multimap.
+  ///
+  /// The operation is equivalent to doing `this[key] = value` for each key and
+  /// associated value in other. It iterates over [other], which must therefore
+  /// not change during the iteration.
+  ///
+  /// This implementation iterates through each key of [other] and adds the
+  /// associated values to this instance via [addValues].
   void addAll(Multimap<K, V> other) => other.forEachKey(addValues);
 
   bool remove(Object key, V value) {
@@ -187,7 +168,7 @@ abstract class _BaseMultimap<K, V> implements Multimap<K, V> {
       retValues.addAll(values);
       values.clear();
     }
-    return retValues;
+    return retValues as Iterable<V>;
   }
 
   void clear() {
@@ -195,7 +176,7 @@ abstract class _BaseMultimap<K, V> implements Multimap<K, V> {
     _map.clear();
   }
 
-  void forEachKey(void f(K key, Iterable<V> value)) => _map.forEach(f);
+  void forEachKey(void f(K key, C value)) => _map.forEach(f);
 
   void forEach(void f(K key, V value)) {
     _map.forEach((K key, Iterable<V> values) {
@@ -211,47 +192,75 @@ abstract class _BaseMultimap<K, V> implements Multimap<K, V> {
   bool get isNotEmpty => _map.isNotEmpty;
 }
 
-/**
- * A multimap implementation that uses [List]s to store the values associated
- * with each key.
- */
-class ListMultimap<K, V> extends _BaseMultimap<K, V> {
-  ListMultimap() : super();
+/// A multimap implementation that uses [List]s to store the values associated
+/// with each key.
+class ListMultimap<K, V> extends _BaseMultimap<K, V, List<V>> {
+  ListMultimap();
+
+  /// Constructs a new list-backed multimap. For each element e of [iterable],
+  /// adds an association from [key](e) to [value](e). [key] and [value] each
+  /// default to the identity function.
+  ListMultimap.fromIterable(Iterable iterable,
+      {K key(element), V value(element)})
+      : super.fromIterable(iterable, key: key, value: value);
+
+  @override
   List<V> _create() => new List<V>();
-  void _add(List<V> iterable, V value) => iterable.add(value);
+  @override
+  void _add(List<V> iterable, V value) {
+    iterable.add(value);
+  }
+
+  @override
   void _addAll(List<V> iterable, Iterable<V> value) => iterable.addAll(value);
+  @override
   void _clear(List<V> iterable) => iterable.clear();
-  bool _remove(List<V> iterable, V value) => iterable.remove(value);
+  @override
+  bool _remove(List<V> iterable, Object value) => iterable.remove(value);
+  @override
   List<V> _wrap(Object key, List<V> iterable) =>
       new _WrappedList(_map, key, iterable);
   List<V> operator [](Object key) => super[key];
   List<V> removeAll(Object key) => super.removeAll(key);
-  Map<K, List<V>> toMap() => new _WrappedMap<K, V, List<V>>(this);
+  Map<K, List<V>> asMap() => new _WrappedMap<K, V, List<V>>(this);
 }
 
-/**
- * A multimap implementation that uses [Set]s to store the values associated
- * with each key.
- */
-class SetMultimap<K, V> extends _BaseMultimap<K, V> {
-  SetMultimap() : super();
+/// A multimap implementation that uses [Set]s to store the values associated
+/// with each key.
+class SetMultimap<K, V> extends _BaseMultimap<K, V, Set<V>> {
+  SetMultimap();
+
+  /// Constructs a new set-backed multimap. For each element e of [iterable],
+  /// adds an association from [key](e) to [value](e). [key] and [value] each
+  /// default to the identity function.
+  SetMultimap.fromIterable(Iterable iterable,
+      {K key(element), V value(element)})
+      : super.fromIterable(iterable, key: key, value: value);
+
+  @override
   Set<V> _create() => new Set<V>();
-  void _add(Set<V> iterable, V value) { iterable.add(value); }
+  @override
+  void _add(Set<V> iterable, V value) {
+    iterable.add(value);
+  }
+
+  @override
   void _addAll(Set<V> iterable, Iterable<V> value) => iterable.addAll(value);
+  @override
   void _clear(Set<V> iterable) => iterable.clear();
-  bool _remove(Set<V> iterable, V value) => iterable.remove(value);
-  Set<V> _wrap(Object key, Set<V> iterable) =>
+  @override
+  bool _remove(Set<V> iterable, Object value) => iterable.remove(value);
+  @override
+  Set<V> _wrap(Object key, Iterable<V> iterable) =>
       new _WrappedSet(_map, key, iterable);
   Set<V> operator [](Object key) => super[key];
   Set<V> removeAll(Object key) => super.removeAll(key);
-  Map<K, Set<V>> toMap() => new _WrappedMap<K, V, Set<V>>(this);
+  Map<K, Set<V>> asMap() => new _WrappedMap<K, V, Set<V>>(this);
 }
 
-/**
- * A [Map] that delegates its operations to an underlying multimap.
- */
+/// A [Map] that delegates its operations to an underlying multimap.
 class _WrappedMap<K, V, C extends Iterable<V>> implements Map<K, C> {
-  final _BaseMultimap<K, V> _multimap;
+  final _BaseMultimap<K, V, C> _multimap;
 
   _WrappedMap(this._multimap);
 
@@ -272,7 +281,7 @@ class _WrappedMap<K, V, C extends Iterable<V>> implements Map<K, C> {
   void clear() => _multimap.clear();
   bool containsKey(Object key) => _multimap.containsKey(key);
   bool containsValue(Object value) => _multimap.containsValue(value);
-  void forEach(void f(K key, Iterable<V> value)) => _multimap.forEachKey(f);
+  void forEach(void f(K key, C value)) => _multimap.forEachKey(f);
   bool get isEmpty => _multimap.isEmpty;
   bool get isNotEmpty => _multimap.isNotEmpty;
   Iterable<K> get keys => _multimap.keys;
@@ -281,26 +290,22 @@ class _WrappedMap<K, V, C extends Iterable<V>> implements Map<K, C> {
   Iterable<C> get values => _multimap._groupedValues;
 }
 
-/**
- * Iterable wrapper that syncs to an underlying map.
- */
-class _WrappedIterable<K, V> implements Iterable<V> {
+/// Iterable wrapper that syncs to an underlying map.
+class _WrappedIterable<K, V, C extends Iterable<V>> implements Iterable<V> {
   final K _key;
-  final Map<K, Iterable<V>> _map;
-  Iterable<V> _delegate;
+  final Map<K, C> _map;
+  C _delegate;
 
   _WrappedIterable(this._map, this._key, this._delegate);
 
   _addToMap() => _map[_key] = _delegate;
 
-  /**
-   * Ensures we hold an up-to-date delegate. In the case where all mappings for
-   * _key are removed from the multimap, the Iterable referenced by _delegate is
-   * removed from the underlying map. At that point, any new addition via the
-   * multimap triggers the creation of a new Iterable, and the empty delegate
-   * we hold would be stale. As such, we check the underlying map and update
-   * our delegate when the one we hold is empty.
-   */
+  /// Ensures we hold an up-to-date delegate. In the case where all mappings
+  /// for _key are removed from the multimap, the Iterable referenced by
+  /// _delegate is removed from the underlying map. At that point, any new
+  /// addition via the multimap triggers the creation of a new Iterable, and
+  /// the empty delegate we hold would be stale. As such, we check the
+  /// underlying map and update our delegate when the one we hold is empty.
   _syncDelegate() {
     if (_delegate.isEmpty) {
       var updated = _map[_key];
@@ -330,7 +335,7 @@ class _WrappedIterable<K, V> implements Iterable<V> {
     return _delegate.every(test);
   }
 
-  Iterable expand(Iterable f(V element)) {
+  Iterable/*<T>*/ expand/*<T>*/(Iterable/*<T>*/ f(V element)) {
     _syncDelegate();
     return _delegate.expand(f);
   }
@@ -345,9 +350,10 @@ class _WrappedIterable<K, V> implements Iterable<V> {
     return _delegate.firstWhere(test, orElse: orElse);
   }
 
-  fold(initialValue, combine(previousValue, V element)) {
+  dynamic/*=T*/ fold/*<T>*/(var/*=T*/ initialValue,
+      dynamic/*=T*/ combine(var/*=T*/ previousValue, V element)) {
     _syncDelegate();
-    _delegate.fold(initialValue, combine);
+    return _delegate.fold(initialValue, combine);
   }
 
   void forEach(void f(V element)) {
@@ -390,7 +396,7 @@ class _WrappedIterable<K, V> implements Iterable<V> {
     return _delegate.length;
   }
 
-  Iterable map(f(V element)) {
+  Iterable/*<T>*/ map/*<T>*/(/*=T*/ f(V element)) {
     _syncDelegate();
     return _delegate.map(f);
   }
@@ -440,136 +446,148 @@ class _WrappedIterable<K, V> implements Iterable<V> {
     return _delegate.toSet();
   }
 
+  String toString() {
+    _syncDelegate();
+    return _delegate.toString();
+  }
+
   Iterable<V> where(bool test(V element)) {
     _syncDelegate();
     return _delegate.where(test);
   }
 }
 
-class _WrappedList<K, V> extends _WrappedIterable<K, V> implements List<V> {
-  _WrappedList(Map<K, Iterable<V>> map, K key, List<V> delegate) :
-      super(map, key, delegate);
+class _WrappedList<K, V> extends _WrappedIterable<K, V, List<V>>
+    implements List<V> {
+  _WrappedList(Map<K, Iterable<V>> map, K key, List<V> delegate)
+      : super(map, key, delegate);
 
   V operator [](int index) => elementAt(index);
 
   void operator []=(int index, V value) {
-    (_delegate as List)[index] = value;
+    _syncDelegate();
+    _delegate[index] = value;
   }
 
   void add(V value) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    (_delegate as List).add(value);
+    _delegate.add(value);
     if (wasEmpty) _addToMap();
   }
 
   void addAll(Iterable<V> iterable) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    (_delegate as List).addAll(iterable);
+    _delegate.addAll(iterable);
     if (wasEmpty) _addToMap();
   }
 
   Map<int, V> asMap() {
     _syncDelegate();
-    return (_delegate as List).asMap();
+    return _delegate.asMap();
   }
 
   void clear() {
     _syncDelegate();
-    (_delegate as List).clear();
+    _delegate.clear();
     _map.remove(_key);
   }
 
   void fillRange(int start, int end, [V fillValue]) {
     _syncDelegate();
-    (_delegate as List).fillRange(start, end, fillValue);
+    _delegate.fillRange(start, end, fillValue);
   }
 
   Iterable<V> getRange(int start, int end) {
     _syncDelegate();
-    return (_delegate as List).getRange(start, end);
+    return _delegate.getRange(start, end);
   }
 
   int indexOf(V element, [int start = 0]) {
     _syncDelegate();
-    return (_delegate as List).indexOf(element, start);
+    return _delegate.indexOf(element, start);
   }
 
   void insert(int index, V element) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    (_delegate as List).insert(index, element);
+    _delegate.insert(index, element);
     if (wasEmpty) _addToMap();
   }
 
   void insertAll(int index, Iterable<V> iterable) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    (_delegate as List).insertAll(index, iterable);
+    _delegate.insertAll(index, iterable);
     if (wasEmpty) _addToMap();
   }
 
   int lastIndexOf(V element, [int start]) {
     _syncDelegate();
-    return (_delegate as List).lastIndexOf(element, start);
+    return _delegate.lastIndexOf(element, start);
   }
 
   void set length(int newLength) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    (_delegate as List).length = newLength;
+    _delegate.length = newLength;
     if (wasEmpty) _addToMap();
   }
 
   bool remove(Object value) {
     _syncDelegate();
-    bool removed = (_delegate as List).remove(value);
+    bool removed = _delegate.remove(value);
     if (_delegate.isEmpty) _map.remove(_key);
     return removed;
   }
 
   V removeAt(int index) {
     _syncDelegate();
-    V removed = (_delegate as List).removeAt(index);
+    V removed = _delegate.removeAt(index);
     if (_delegate.isEmpty) _map.remove(_key);
     return removed;
   }
 
   V removeLast() {
     _syncDelegate();
-    V removed = (_delegate as List).removeLast();
+    V removed = _delegate.removeLast();
     if (_delegate.isEmpty) _map.remove(_key);
     return removed;
   }
 
   void removeRange(int start, int end) {
     _syncDelegate();
-    (_delegate as List).removeRange(start, end);
+    _delegate.removeRange(start, end);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   void removeWhere(bool test(V element)) {
     _syncDelegate();
-    (_delegate as List).removeWhere(test);
+    _delegate.removeWhere(test);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   void replaceRange(int start, int end, Iterable<V> iterable) {
     _syncDelegate();
-    (_delegate as List).replaceRange(start, end, iterable);
+    _delegate.replaceRange(start, end, iterable);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   void retainWhere(bool test(V element)) {
     _syncDelegate();
-    (_delegate as List).retainWhere(test);
+    _delegate.retainWhere(test);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   Iterable<V> get reversed {
     _syncDelegate();
-    return (_delegate as List).reversed;
+    return _delegate.reversed;
   }
 
   void setAll(int index, Iterable<V> iterable) {
     _syncDelegate();
-    (_delegate as List).setAll(index, iterable);
+    _delegate.setAll(index, iterable);
   }
 
   void setRange(int start, int end, Iterable<V> iterable, [int skipCount = 0]) {
@@ -578,95 +596,99 @@ class _WrappedList<K, V> extends _WrappedIterable<K, V> implements List<V> {
 
   void shuffle([Random random]) {
     _syncDelegate();
-    (_delegate as List).shuffle(random);
+    _delegate.shuffle(random);
   }
 
   void sort([int compare(V a, V b)]) {
     _syncDelegate();
-    (_delegate as List).sort(compare);
+    _delegate.sort(compare);
   }
 
   List<V> sublist(int start, [int end]) {
     _syncDelegate();
-    return (_delegate as List).sublist(start, end);
+    return _delegate.sublist(start, end);
   }
 }
 
-class _WrappedSet<K, V> extends _WrappedIterable<K, V> implements Set<V> {
-  _WrappedSet(Map<K, Iterable<V>> map, K key, Iterable<V> delegate) :
-      super(map, key, delegate);
+class _WrappedSet<K, V> extends _WrappedIterable<K, V, Set<V>>
+    implements Set<V> {
+  _WrappedSet(Map<K, Iterable<V>> map, K key, Iterable<V> delegate)
+      : super(map, key, delegate);
 
   bool add(V value) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    bool wasAdded = (_delegate as Set).add(value);
+    bool wasAdded = _delegate.add(value);
     if (wasEmpty) _addToMap();
     return wasAdded;
   }
 
   void addAll(Iterable<V> elements) {
+    _syncDelegate();
     var wasEmpty = _delegate.isEmpty;
-    (_delegate as Set).addAll(elements);
+    _delegate.addAll(elements);
     if (wasEmpty) _addToMap();
   }
 
   void clear() {
     _syncDelegate();
-    (_delegate as Set).clear();
+    _delegate.clear();
     _map.remove(_key);
   }
 
   bool containsAll(Iterable<Object> other) {
     _syncDelegate();
-    return (_delegate as Set).containsAll(other);
+    return _delegate.containsAll(other);
   }
 
-  Set<V> difference(Set<V> other) {
+  Set<V> difference(Set<Object> other) {
     _syncDelegate();
-    return (_delegate as Set).difference(other);
+    return _delegate.difference(other);
   }
 
   Set<V> intersection(Set<Object> other) {
     _syncDelegate();
-    return (_delegate as Set).intersection(other);
+    return _delegate.intersection(other);
   }
 
   V lookup(Object object) {
-    return (_delegate as Set).lookup(object);
+    _syncDelegate();
+    return _delegate.lookup(object);
   }
 
   bool remove(Object value) {
     _syncDelegate();
-    bool removed = (_delegate as Set).remove(value);
+    bool removed = _delegate.remove(value);
     if (_delegate.isEmpty) _map.remove(_key);
     return removed;
   }
 
   void removeAll(Iterable<Object> elements) {
     _syncDelegate();
-    (_delegate as Set).removeAll(elements);
+    _delegate.removeAll(elements);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   void removeWhere(bool test(V element)) {
     _syncDelegate();
-    (_delegate as Set).removeWhere(test);
+    _delegate.removeWhere(test);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   void retainAll(Iterable<Object> elements) {
     _syncDelegate();
-    (_delegate as Set).retainAll(elements);
+    _delegate.retainAll(elements);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   void retainWhere(bool test(V element)) {
     _syncDelegate();
-    (_delegate as Set).retainWhere(test);
+    _delegate.retainWhere(test);
     if (_delegate.isEmpty) _map.remove(_key);
   }
 
   Set<V> union(Set<V> other) {
     _syncDelegate();
-    return (_delegate as Set).union(other);
+    return _delegate.union(other);
   }
 }
